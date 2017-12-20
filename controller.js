@@ -10,14 +10,10 @@ const loadGame = function () {
 }
 
 const displayGameTable = function (gameArray) {
-  console.log(gameArray);
   gameArray.forEach((element,index)=>{
     let cell=document.getElementById(index);
-    if(element==0){
-      cell.innerText="";
-    }else {
-      cell.innerText=element;
-    }
+    cell.innerText="";
+    if(element>0)cell.innerText=element;
   })
 }
 
@@ -56,6 +52,12 @@ const shiftElementsDownword = function () {
   game.addRandomElement();
   displayGameTable(game.gameArray)
 }
+
+/*
+Think about these functions in these functions there is repeatation I can see
+Try to make "Common Fucntion" for all these functions
+Here for action you should know direction and other things are nearly the same
+*/
 
 const actions={
   ArrowUp:shiftElementsUpword,
