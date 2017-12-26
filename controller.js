@@ -29,29 +29,7 @@ const startGame = function () {
   document.getElementById("startGame").onclick=null;
 }
 
-const shiftElementsLeft = function () {
-  game.shiftElementsLeft();
-  game.addRandomElement();
-  displayGameTable(game.gameArray)
-}
 
-const shiftElementsRight = function () {
-  game.shiftElementsRight();
-  game.addRandomElement();
-  displayGameTable(game.gameArray)
-}
-
-const shiftElementsUpword = function () {
-  game.shiftElementsUpword();
-  game.addRandomElement();
-  displayGameTable(game.gameArray)
-}
-
-const shiftElementsDownword = function () {
-  game.shiftElementsDownword();
-  game.addRandomElement();
-  displayGameTable(game.gameArray)
-}
 
 /*
 Think about these functions in these functions there is repeatation I can see
@@ -59,25 +37,45 @@ Try to make "Common Fucntion" for all these functions
 Here for action you should know direction and other things are nearly the same
 */
 
-const actions={
-  ArrowUp:shiftElementsUpword,
-  ArrowDown:shiftElementsDownword,
-  ArrowRight:shiftElementsRight,
-  ArrowLeft:shiftElementsLeft,
+const actionAfterUpArrow = function () {
+  game.shiftElementsUpword();
 }
 
-const gameOver = function () {
+const actionAfterDownArrow = function () {
+  game.shiftElementsDownword();
+}
+
+const actionAfterRightArrow = function () {
+  game.shiftElementsRight();
+}
+
+const actionAfterLeftArrow = function () {
+  game.shiftElementsLeft();
+}
+
+const actions={
+  ArrowUp:actionAfterUpArrow,
+  ArrowDown:actionAfterDownArrow,
+  ArrowRight:actionAfterRightArrow,
+  ArrowLeft:actionAfterLeftArrow,
+}
+
+const displayGameOver = function () {
   document.getElementById('message').innerText="GameOver";
   onkeyup=null;
 }
 
 const takeActionAccordingToInput = function (event) {
   if(game.isGameOver()){
-    gameOver();
+    displayGameOver();
     return ;
   }
   if(event.keyCode<41&&event.keyCode>36){
     actions[event.key]();
+    game.addRandomElement();
+    game.updateColumns();
+    game.updateRows();
+    displayGameTable(game.gameArray);
   }
 }
 

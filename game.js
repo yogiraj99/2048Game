@@ -1,3 +1,7 @@
+const isEveryElementNonZero = function (listOfElements) {
+  return listOfElements.every((element)=>{return element>0;});
+}
+
 const Game = function () {
   this.gameArray=[];
   this.score=0;
@@ -23,9 +27,35 @@ Game.prototype.startGame = function () {
   this.addRandomElement();
 };
 
-Game.prototype.isGameOver = function () {
-  return this.gameArray.every((element)=>{return element>0;})
+Game.prototype.canElementsBeMerged = function () {
+  let that=this;
+  return this.columns.some(that.isAnyRepetitionOfNumber)||this.rows.some(that.isAnyRepetitionOfNumber);
 };
+
+Game.prototype.isAnyRepetitionOfNumber = function (listOfElements) {
+  for (let i = 0; i < listOfElements.length-1; i++) {
+    let currentElement=listOfElements[i];
+    let nextElement=listOfElements[i+1];
+    if (currentElement==nextElement) {
+      return true;
+    }
+  }
+  return false;
+}
+
+Game.prototype.isGameOver = function () {
+  console.log(!this.canElementsBeMerged());
+  console.log(isEveryElementNonZero(this.gameArray));
+  return isEveryElementNonZero(this.gameArray)&&(!this.canElementsBeMerged());
+};
+
+Game.prototype.isValidIndex = function (index) {
+  return this.gameArray[index]==0;
+};
+
+Game.prototype.removeZeros = function (array) {
+  return array.filter((element)=>{return element!=0;});
+}
 
 Game.prototype.addRandomElement = function () {
   let index=this.genrateRandomIndex();
@@ -41,10 +71,7 @@ Game.prototype.genrateRandomIndex = function () {
   return Math.floor(Math.random()*(this.gameArray.length));
 };
 
-//change This to updateRows Function
-
 Game.prototype.getRows = function (array) {
-  // let array=this.gameArray;
   let rows=[];
   rows.push(array.slice(0,4));
   rows.push(array.slice(4,8));
@@ -53,10 +80,16 @@ Game.prototype.getRows = function (array) {
   return rows;
 };
 
-//change This to updateColumns Function
+Game.prototype.getReverseRows = function (array) {
+  let rows=this.getRows(array);
+  return rows.map((row)=>{return row.reverse();})
+};
+
+Game.prototype.updateRows = function () {
+  this.rows=this.getRows(this.gameArray);
+};
 
 Game.prototype.getColumns = function (array) {
-  // let array=this.gameArray;
   let columns=[];
   for(let index=0;index<4;index++){
     let column=[];
@@ -69,19 +102,8 @@ Game.prototype.getColumns = function (array) {
   return columns;
 };
 
-Game.prototype.removeZeros = function (array) {
-  return array.filter((element)=>{return element!=0;});
-}
-
-Game.prototype.shiftElementsLeft = function () {
-  let rows=this.getRows(this.gameArray);
-  let updatedRows=this.updateArray(rows);
-  this.gameArray=this.joinArraysIntoOne(updatedRows)
-};
-
-Game.prototype.getReverseRows = function (array) {
-  let rows=this.getRows(array);
-  return rows.map((row)=>{return row.reverse();})
+Game.prototype.updateColumns = function () {
+  this.columns=this.getColumns(this.gameArray);
 };
 
 Game.prototype.getReverseColumns = function (array) {
@@ -102,6 +124,26 @@ Game.prototype.joinArraysIntoOne = function (arrayOfArray) {
   },[])
 };
 
+Game.prototype.actionAfterLeftArrow = function () {
+  this.shiftElementsLeft();
+  this.addRandomElement();
+}
+
+Game.prototype.actionAfterRightArrow = function () {
+  this.shiftElementsRight();
+  this.addRandomElement();
+}
+
+Game.prototype.actionAfterUpArrow = function () {
+  this.shiftElementsUpword();
+  this.addRandomElement();
+}
+
+Game.prototype.actionAfterDownArrow = function () {
+  this.shiftElementsDownword();
+  this.addRandomElement();
+}
+
 Game.prototype.joinReverseArraysIntoOne = function (arrayOfArray) {
   return arrayOfArray.reduce((intialArray,array)=>{
     return intialArray.concat(array.reverse())},[]);
@@ -113,6 +155,11 @@ Game.prototype.getMergedArray = function (groupOfElements) {
   return this.mergeSimiliarElements(groupToBeMerged);
 };
 
+Game.prototype.addZerosToMakeLength4 = function (array) {
+  let arrayOfZeros=new Array(4-array.length).fill(0);
+  array=array.concat(arrayOfZeros);
+  return array;
+};
 
 Game.prototype.shiftElementsUpword = function () {
   let columns=this.getColumns(this.gameArray);
@@ -130,17 +177,18 @@ Game.prototype.shiftElementsDownword = function () {
   this.gameArray=this.joinArraysIntoOne(rows);
 };
 
+Game.prototype.shiftElementsLeft = function () {
+  let rows=this.getRows(this.gameArray);
+  let updatedRows=this.updateArray(rows);
+  this.gameArray=this.joinArraysIntoOne(updatedRows)
+};
+
 Game.prototype.shiftElementsRight = function () {
   let reverseRows=this.getReverseRows(this.gameArray);
   let updatedReverseRows=this.updateArray(reverseRows);
   this.gameArray=this.joinReverseArraysIntoOne(updatedReverseRows);
 };
 
-Game.prototype.addZerosToMakeLength4 = function (array) {
-  let arrayOfZeros=new Array(4-array.length).fill(0);
-  array=array.concat(arrayOfZeros);
-  return array;
-};
 
 /*
 
@@ -182,9 +230,6 @@ Game.prototype.mergeSimiliarElements = function (array) {
   return array;
 };
 
-Game.prototype.isValidIndex = function (index) {
-  return this.gameArray[index]==0;
-};
 
 // module.exports = Game;
 
